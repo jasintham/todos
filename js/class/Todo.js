@@ -1,4 +1,3 @@
-
 import { Task } from "./Task.js";
 
 class Todos{
@@ -22,16 +21,21 @@ class Todos{
         })
     }
 
+    getCount = () =>{
+        const activeTasks = this.#tasks.filter(obj => !obj.completed);
+        return activeTasks.length;
+    }
+
     #readJson = (taskAsJson) => {
         taskAsJson.forEach(node => {
-            const task = new Task(node.id, node.description);
-            this.#tasks.push({id : task.getId(), description:task.getText()})
+            const task = new Task(node.id, node.description, node.is_completed);
+            this.#tasks.push({id : task.getId(), description:task.getText(), completed:task.getCompleted()})
         });
     }
 
     #addToArray = (id, text) => {
         const task = new Task(id, text);
-        const ele = {id : task.getId(), description:task.getText()};
+        const ele = {id : task.getId(), description:task.getText(), completed:task.getCompleted()};
         this.#tasks.push(ele)
         return ele
     }
@@ -62,6 +66,22 @@ class Todos{
         return new Promise(async(resolve, rejects) => {
             fetch(this.#backend_url + '/delete/' + id, {
                 method:'delete'
+            })
+            .then((response) => response.json())
+            .then((json) => {
+                this.#removeFromArray(id)
+                console.log(json);
+                resolve(json.id)
+            }, (error) => {
+                rejects(error);
+            })
+        })
+    }
+
+    completeTask = (id) => {
+        return new Promise(async(resolve, rejects) => {
+            fetch(this.#backend_url + '/complete/' + id, {
+                method:'put'
             })
             .then((response) => response.json())
             .then((json) => {

@@ -1,2 +1,47 @@
+body{
+    height: 100vh;
+    background: linear-gradient(135deg, #41e5e2, #361643);
+}
+
+.app-container{
+    width: 40%;
+    min-width: 500px;
+    margin: auto;
+    margin-top: 2%;
+}
+
 h3{ margin: 1em 0;}
 form{ margin-bottom: 1em;}
+form p{
+    font-size: 10px;
+    color: antiquewhite;
+    margin-top: 2px;
+}
+
+.btn-add-tasks{
+    background-color: #529fec;
+    color: #ffffff;
+    border-color: #529fec;
+    margin-left: 30px !important;
+}
+
+.display-container p{
+    margin-bottom: 2px;
+    font-size: 16px;
+    color: #040101;
+    width: 88%;
+    padding-right: 10px;
+    text-align: justify;
+}
+.form-check-input{
+    margin-right: 10px;
+}
+.input-group{
+    margin-bottom: 2px !important;
+}
+.list-group-item{
+    padding-right: 0px;
+}
+input[type="checkbox"] {
+    cursor: pointer;
+}

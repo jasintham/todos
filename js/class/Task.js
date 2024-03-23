@@ -1,10 +1,12 @@
 class Task{
     #id;
     #text;
+    #completed;
 
-    constructor(id, text){
+    constructor(id, text, completed){
         this.#id = id;
-        this.#text = text
+        this.#text = text;
+        this.#completed = completed;
     }
 
     getId(){
@@ -13,6 +15,10 @@ class Task{
 
     getText(){
         return this.#text;
+    }
+
+    getCompleted(){
+        return this.#completed;
     }
 }
 

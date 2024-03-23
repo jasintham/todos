@@ -1,57 +1,94 @@
-const BACKEND_ROOT_URL = 'https://todo-backend-br7m.onrender.com';
+const BACKEND_ROOT_URL = 'http://localhost:3001';
 import { Todos } from "./class/Todo.js";
 
 const todos = new Todos(BACKEND_ROOT_URL);
 
 const list = document.querySelector('ul');
 const input = document.querySelector('input');
+const countBox = document.querySelector('#count');
+const addButton = document.querySelector('#btn-add-tasks');
 
 const renderTask = (task) => {
     const li = document.createElement('li');
-    li.setAttribute('class', 'list-group-item');
-
-    console.log(task.description);
+    li.setAttribute('class', 'list-group-item d-flex');
     li.setAttribute('data-key', task.id);
-    li.innerHTML = task.description;
-
     renderSpan(li, task.description);
     renderLink(li, task.id);
-    list.append(li);
+    renderCheckbox(li, task.id, task.completed);
+    taskCount();
+    list.prepend(li);
 }
 
 const renderSpan = (li, text) => {
-    const span = li.appendChild(document.createElement('span'));
-    //span.innerHTML = '<i style="float: right" class="bi bi-trash"></i>';
+    const span = li.appendChild(document.createElement('p'));
+    span.innerHTML = text;
 }
 
+const renderCheckbox = (li, id, completed) => {
+    const newCheckBox = document.createElement('input');
+    newCheckBox.type = 'checkbox';
+    newCheckBox.id = id ;
+    newCheckBox.name = 'checkbox';
+    newCheckBox.value = 0
+    newCheckBox.setAttribute("class", "form-check-input");
+    li.prepend(newCheckBox);
+
+    if(completed){
+        disableCheckBox(li, id);
+    }
+
+    newCheckBox.addEventListener('click', (event) => {
+        var adjSpanBox = event.target.nextSibling;
+        adjSpanBox.setAttribute("class", 'text-decoration-line-through');
+        event.target.setAttribute("disabled", true);
+        todos.completeTask(id).then((complete_id) => {
+            if(complete_id){
+                taskCount();
+            }
+        }).catch((error) => {
+            console.log(error);
+        })
+    })
+}
+
+const taskCount = () => {
+    const count = todos.getCount();
+    countBox.innerHTML = count
+}
+
+const disableCheckBox = (li, id) => {
+    li.childNodes[0].setAttribute("disabled", true);
+    li.childNodes[0].checked = true;
+    li.childNodes[1].setAttribute("class", 'text-decoration-line-through');
+}
+
+
 const renderLink = (li, id) => {
+    
     const a = li.appendChild(document.createElement('a'));
-    a.innerHTML = '<i style="float: right" class="bi bi-trash"></i>';
+
+    a.innerHTML = '<i style="float: right; cursor: pointer;" class="bi bi-trash"></i>';
     a.addEventListener('click', (event) => {
         todos.removeTask(id).then((remove_id) => {
             const li_to_remove = document.querySelector(`[data-key='${remove_id}']`);
-            console.log('remove_id : '+remove_id);
-            console.log(li_to_remove);
             if(li_to_remove){
-                console.log(li_to_remove)
                 list.removeChild(li_to_remove);
             }
         }).catch((error) => {
-            alert(error);
+            console.log(error);
         })
     })
-   
 }
 
 const getTasks = () => {
     todos.getTask().then((tasks) => {
+        taskCount();
         tasks.forEach(task => {
-            renderTask(task)
+            renderTask(task);
         })
     }).catch((error) => {
         alert(error + '2');
     })
-    
 } 
 
 
@@ -76,13 +113,22 @@ getTasks();
 input.addEventListener('keypress', (event) => {
     if (event.key === 'Enter') {
         event.preventDefault();
-        const task = input.value.trim();
-        if(task !== ''){
-            todos.addTask(task).then(task => {
-                renderTask(task);
-                input.value = '';
-                input.focus();
-            })
-        }
+        addTaskIfNotEmpty();
     }
+});
+
+const addTaskIfNotEmpty = () =>{
+    const task = input.value.trim();
+    if(task !== '') {
+        todos.addTask(task).then(task => {
+            renderTask(task);
+            input.value = '';
+            input.focus();
+        });
+    }
+}
+
+// Event listener for the button's click event
+addButton.addEventListener('click', (event) => {
+    addTaskIfNotEmpty();
 });
